@@ -1,0 +1,74 @@
+#!/usr/bin/bash
+
+MAX=100		# Maximum value of secret
+MAX_TRIES=7	# Maximum number of tries (guesses)
+GAMES=0		# How many games have been played
+WINS=0		# How many games the user has won
+
+clear		# Clear the screen
+tput setaf 5	# Select purple text
+echo "=== Number-Guessing Game ==="
+echo
+echo "I have a secret number between 1 and $MAX"
+echo "Your mission is to guess it in as few tries as possible."
+echo "You have a maximum of $MAX_TRIES guesses to succeed."
+echo
+
+PLAY="Y"
+# This next loop continues until the user says
+# they don't want to play again
+while [[ "$PLAY" == "Y" || "$PLAY" == "y" || "$PLAY" == "YES" ||
+     "$PLAY" == "Yes" || "$PLAY" == "yes" ]]
+do
+      # Generate a random number from 1-MAX
+	SECRET=$(( RANDOM % MAX + 1 ))	
+
+      # Un-comment this line when debugging!
+      # echo "NOTE: the secret number is $SECRET"
+
+	GUESS=0
+	TRIES=0
+	((GAMES++))
+
+	# This next loop continues until the user guess correctly
+	# or the maximum number of guesses is exhausted
+	until [[ $GUESS -eq $SECRET || $TRIES -ge $MAX_TRIES ]]
+	do
+		tput setaf 15	# White text
+		read -p "Enter your guess (#$((++TRIES))): " GUESS
+		if [[ $GUESS -gt $SECRET ]]
+		then
+			tput setaf 1	# Red text
+			echo "Too high!"
+		elif [[ $GUESS -lt $SECRET ]]
+		then
+			tput setaf 1	# Red text
+			echo "Too low!"
+		else
+			tput setaf 10	# Green text
+			echo "You got it in $((TRIES)) tries!"
+			((WINS++))
+		fi
+		echo
+	done
+	if [[ ! $GUESS -eq $SECRET ]]
+	then
+		tput setaf 11	# Yellow text
+		echo "You lose after $TRIES attempts. The number was $SECRET. "
+	fi
+
+	tput setaf 15	# White texxt
+	echo 
+	read -p "Do you want to play again (Y/N)? " PLAY
+	echo
+
+done
+tput setaf 5	# Purple text
+
+# In the next line, the multiplication 
+# must preceed the division because 
+# this is integer math
+echo "You executed $GAMES missions and succeeded $WINS times ($((WINS*100/GAMES))% success)."
+
+echo
+tput sgr0	# Reset to normal text
